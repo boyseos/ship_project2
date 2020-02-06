@@ -16,11 +16,16 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.ship.web.article.Article;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ship.web.proxy.Proxy;
+import com.ship.web.reservation.Reservation;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,7 +36,7 @@ import lombok.ToString;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-@Setter(AccessLevel.PROTECTED)
+@Setter(AccessLevel.PUBLIC)
 @ToString
 @Table(name="PERSON", 
 	uniqueConstraints = 
@@ -40,8 +45,8 @@ import lombok.ToString;
 public class Person extends Proxy implements Serializable{
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name="PERSONSEQ") @NotNull
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name="PERSONSEQ")
 	private Long personseq;
 	@Column(name="USERID", length= 64 ) @NotNull
 		private String userid;
@@ -53,15 +58,10 @@ public class Person extends Proxy implements Serializable{
 		private String tel;
 	@Column(name="POINT") 
 		private String point;
-//	@Temporal(TemporalType.DATE)
-//	@Column(name="BIRTHDAY") @NotNull
-//		private Date birthday;
 	@Column(name="AGE")@NotNull
 		private int age;
 	@Column(name="MALE")@NotNull
 		private boolean male;
-//	@Column(name="EMAIL") @NotNull
-//		private String email;
 	@Column(name="SCORE") 
 		private int score;
 	@Column(name="MVP") 
@@ -82,18 +82,24 @@ public class Person extends Proxy implements Serializable{
 		private String job;
 	@Column(name="EMAIL")@NotNull
 		private String email;
+	@Column(name="SUMMONERNAME")
+		private String summonername;
 	enum Level{HIGH, MID, LOW}
-	
-//	@OneToMany(mappedBy = "personseq",
-//			cascade = CascadeType.ALL,
-//			orphanRemoval = true)
-//    private List<Article> articles = new ArrayList<>();
+
+	/*
+	 * @OneToMany(mappedBy = "PERSONSEQ", cascade = CascadeType.ALL, orphanRemoval =
+	 * true) private List<Article> articles = new ArrayList<>();
+	 */
+	@JsonIgnore
+	@OneToMany(mappedBy = "personseq", cascade = CascadeType.ALL, orphanRemoval=true)
+	private List<Reservation> reservations = new ArrayList<>();
+	 
 
 	@Builder
 	private Person(String userid, String name, String passwd, String tel,
 			 String point, int age, boolean male, int score, int mvp,
 			 int win, int km, boolean bookmark, String interest,
-			 boolean lolblack, boolean futblack, String job, String email) {
+			 boolean lolblack, boolean futblack, String job, String email, String summonername) {
 		
 		this.userid = userid;
 		this.name = name;
@@ -112,5 +118,6 @@ public class Person extends Proxy implements Serializable{
 		this.futblack = futblack;
 		this.job = job;
 		this.email = email;
+		this.summonername = summonername;
 	}
-}//testYOHAN
+}
